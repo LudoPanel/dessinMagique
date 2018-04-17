@@ -22,14 +22,13 @@ def reducColor(img, k):
     return res2
 
 
-def recupContour(imgInitiale, imgKMean):
+def recupContour(imgInitiale, imgNettoyee):
 
     # On applique un gradient avec un gamma8
     structElement = strel.build('diamant', 1, 0)
-    imgAvecGradient = \
-        utils.gradient(imgKMean[:, :, 2], structElement) \
-        + utils.gradient(imgKMean[:, :, 0], structElement) \
-        + utils.gradient(imgKMean[:, :, 1], structElement)
+
+    imageNiveauGris = cv2.cvtColor(imgNettoyee, cv2.COLOR_BGR2GRAY)
+    imgAvecGradient = utils.gradient(imageNiveauGris, structElement)
 
     # Puis on applique un seuil
     seuil = 1
@@ -43,3 +42,20 @@ def recupContour(imgInitiale, imgKMean):
     imgContour[index] = (255, 255, 255)
 
     return imgContour
+
+
+# def nettoyageImage(image, pixelMax, largeurMax):
+#
+#     # Threshold it so it becomes binary
+#     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+#     ret, thresh = cv2.threshold(gray_image, 0, 255, cv2.THRESH_BINARY)
+#
+#     # You need to choose 4 or 8 for connectivity type
+#     connectivity = 4
+#
+#     # Perform the operation
+#     output = cv2.connectedComponentsWithStats(thresh, connectivity, cv2.CV_32S)
+#
+#
+#
+#     return imageNettoye

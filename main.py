@@ -5,9 +5,9 @@ import cv2, kMean, utils
 #######
 
 nomImage = 'caillou.png'
-nombreDeCouleur = 4
+nombreDeCouleur = 8
 aireZoneMax = 400
-largeurZoneMax = 30
+largeurZoneMax = 10
 rayonDisqueCouleur = 4
 
 #######

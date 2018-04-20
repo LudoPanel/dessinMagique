@@ -93,7 +93,7 @@ def ajouterIndicationCouleursZone(imgContour, imgNettoyee, rayonDisqueCouleur):
     taille = imgContour.shape
     for centroid in centroids[0:output[0]]:
         for (i, j) in structElement:
-            if int(centroid[1]) < (taille[1] - 2) and int(centroid[0]) < (taille[0] - 2):
+            if int(centroid[1]) < (taille[1] - rayonDisqueCouleur) and int(centroid[0]) < (taille[0] - rayonDisqueCouleur):
                 imgContour[i + int(centroid[1]), j + int(centroid[0])] = imgNettoyee[int(centroid[1]), int(centroid[0])]
 
     return imgContour

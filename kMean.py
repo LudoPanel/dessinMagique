@@ -154,14 +154,13 @@ def ajouterIndicationCouleursZoneErosionSuccessives(imgContour, imgNettoyee, ray
                         for x in range(0, taille[0]):
                             for y in range(0, taille[1]):
                                 if np.any(imgErodee[x, y]) != 0:
-
-                                    # Boucle permettant de creer notre cercle de couleur a partir de l'element structurant
-                                    for (i, j) in structElementCercle:
-                                        if x < (taille[1] - rayonDisqueCouleur) and y < (
-                                                taille[0] - rayonDisqueCouleur):
-                                            imgFinale[x + i, j + y] = imgNettoyee[
-                                                x, y]
+                                    pixel = (x, y)
                                     break
+
+                        # Boucle permettant de creer notre cercle de couleur a partir de l'element structurant
+                        for (i, j) in structElementCercle:
+                            if pixel[0] < (taille[1] - rayonDisqueCouleur) and pixel[1] < (taille[0] - rayonDisqueCouleur):
+                                imgFinale[pixel[0] + i, j + pixel[1]] = imgNettoyee[pixel[0], pixel[1]]
 
 
                         continuer = False

@@ -5,9 +5,9 @@ import cv2, kMean, utils
 #######
 
 nomImage = 'caillou.png'
-nombreDeCouleur = 8
-aireZoneMax = 400
-largeurZoneMax = 10
+nombreDeCouleur = 6
+aireZoneMax =100
+largeurZoneMax = 2
 rayonDisqueCouleur = 4
 
 #######
@@ -26,9 +26,12 @@ imgNettoyee = kMean.nettoyageImage(imgKMean, aireZoneMax, largeurZoneMax)
 utils.displayImage(imgNettoyee, 'Image nettoyee')
 
 # On extrait les contours de l'image
-imgContour = kMean.recupContour(img, imgNettoyee)
+imgContour = kMean.traceContour(img, imgNettoyee)
 utils.displayImage(imgContour, 'Image contour')
 
 # On pose les indications dans les zones
 imgFinale = kMean.ajouterIndicationCouleursZone(imgContour, imgNettoyee, rayonDisqueCouleur)
-utils.displayImage(imgFinale, 'Image finale')
+utils.displayImage(imgFinale, 'Image finale methode 1')
+
+imgFinale = kMean.ajouterIndicationCouleursZone2(imgContour, imgNettoyee, rayonDisqueCouleur)
+utils.displayImage(imgFinale, 'Image finale methode 2')

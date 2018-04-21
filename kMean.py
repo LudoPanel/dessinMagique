@@ -22,7 +22,7 @@ def reducColor(img, k):
     return res2
 
 
-def recupContour(imgInitiale, imgNettoyee):
+def traceContour(imgInitiale, imgNettoyee):
 
     # On applique un gradient avec un gamma8
     structElement = strel.build('diamant', 1, 0)
@@ -68,6 +68,13 @@ def nettoyageImage(image, aireZoneMax, largeurMax):
     imgNettoyee = image
     taille = image.shape
 
+    # gestion de la largeur
+    elementOuverture = strel.build('carre', largeurMax, None)
+    elementReconstruction = strel.build('carre', largeurMax, None)
+
+    imgNettoyee = utils.ouvertureReconstruction(imgNettoyee, elementOuverture, elementReconstruction)
+    imgNettoyee = utils.fermetureReconstruction(imgNettoyee, elementOuverture, elementReconstruction)
+
     # On itere sur nos pixels
     # Pour chaque pixel, on recupere la zone associee afin de connaitre l'aire et la largeur de la bounding box
     # Si c'est trop petit, alors on remplace la couleur par une couleur precedente
@@ -75,7 +82,7 @@ def nettoyageImage(image, aireZoneMax, largeurMax):
         for y in range(0, taille[1]):
             zone = labels[x][y]
             if stats[zone, cv2.CC_STAT_AREA] < aireZoneMax or stats[zone, cv2.cv2.CC_STAT_WIDTH] < largeurMax:
-                imgNettoyee[x, y] = imgNettoyee[x - 2, y]
+                imgNettoyee[x, y] = imgNettoyee[x - 5, y-5]
 
     return imgNettoyee
 
@@ -97,3 +104,63 @@ def ajouterIndicationCouleursZone(imgContour, imgNettoyee, rayonDisqueCouleur):
                 imgContour[i + int(centroid[1]), j + int(centroid[0])] = imgNettoyee[int(centroid[1]), int(centroid[0])]
 
     return imgContour
+
+
+def ajouterIndicationCouleursZone2(imgContour, imgNettoyee, rayonDisqueCouleur):
+
+    taille = imgNettoyee.shape
+    gamma8 = strel.build('carre', 1, None)
+
+    imgFinale  = np.zeros(taille, np.float)
+    imgFinale = np.uint8(imgFinale)
+
+    imgFinale = imgFinale + imgContour
+
+    imgFinale += imgContour
+
+    structElementCercle = strel.build_as_list('disque', rayonDisqueCouleur, None)
+
+    m = np.copy(imgContour)
+    imgContour[0, :] = 0
+    imgContour[m.shape[0] - 1, :] = 0
+    imgContour[:, 0] = 0
+    imgContour[:, m.shape[1] - 1] = 0
+
+    for x in range(0, taille[0]):
+        for y in range(0, taille[1]):
+            if np.any(imgContour[x, y]) != 0:
+
+                # On cherche a isoler la zone
+                m[:] = 0
+                m[x, y] = 255
+                imgReconInf = utils.reconstructionInferieure(imgContour, m, gamma8)
+
+                # Erosion successive
+                continuer = True
+                i = 1
+                while continuer:
+                    structElement = strel.build('disque', i, None)
+                    imgErodee = utils.erode(imgReconInf, structElement)
+
+                    if np.amax(imgErodee) == 0:
+                        structElement = strel.build('disque', i - 1, None)
+                        imgErodee = utils.erode(imgReconInf, structElement)
+
+                        for x in range(0, taille[0]):
+                            for y in range(0, taille[1]):
+                                if np.any(imgErodee[x, y]) != 0:
+                                    for (i, j) in structElementCercle:
+                                        if x < (taille[1] - rayonDisqueCouleur) and y < (
+                                                taille[0] - rayonDisqueCouleur):
+                                            imgFinale[x + i, j + y] = imgNettoyee[
+                                                x, y]
+                                    break
+
+
+                        continuer = False
+
+                    i = i + 1
+
+                imgContour = imgContour - imgReconInf
+
+    return imgFinale

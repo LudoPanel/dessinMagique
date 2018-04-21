@@ -87,7 +87,7 @@ def nettoyageImage(image, aireZoneMax, largeurMax):
     return imgNettoyee
 
 
-def ajouterIndicationCouleursZone(imgContour, imgNettoyee, rayonDisqueCouleur):
+def ajouterIndicationCouleursZoneLabellisation(imgContour, imgNettoyee, rayonDisqueCouleur):
 
     imgray = cv2.cvtColor(imgContour, cv2.COLOR_BGR2GRAY)
     ret, thresh = cv2.threshold(imgray, 127, 255, cv2.THRESH_BINARY)
@@ -106,7 +106,7 @@ def ajouterIndicationCouleursZone(imgContour, imgNettoyee, rayonDisqueCouleur):
     return imgContour
 
 
-def ajouterIndicationCouleursZone2(imgContour, imgNettoyee, rayonDisqueCouleur):
+def ajouterIndicationCouleursZoneErosionSuccessives(imgContour, imgNettoyee, rayonDisqueCouleur):
 
     taille = imgNettoyee.shape
     gamma8 = strel.build('carre', 1, None)

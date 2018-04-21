@@ -30,8 +30,8 @@ imgContour = kMean.traceContour(img, imgNettoyee)
 utils.displayImage(imgContour, 'Image contour')
 
 # On pose les indications dans les zones
-imgFinale = kMean.ajouterIndicationCouleursZone(imgContour, imgNettoyee, rayonDisqueCouleur)
+imgFinale = kMean.ajouterIndicationCouleursZoneLabellisation(imgContour, imgNettoyee, rayonDisqueCouleur)
 utils.displayImage(imgFinale, 'Image finale methode 1')
 
-imgFinale = kMean.ajouterIndicationCouleursZone2(imgContour, imgNettoyee, rayonDisqueCouleur)
+imgFinale = kMean.ajouterIndicationCouleursZoneErosionSuccessives(imgContour, imgNettoyee, rayonDisqueCouleur)
 utils.displayImage(imgFinale, 'Image finale methode 2')

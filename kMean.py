@@ -92,11 +92,13 @@ def ajouterIndicationCouleursZoneLabellisation(imgContour, imgNettoyee, rayonDis
     imgray = cv2.cvtColor(imgContour, cv2.COLOR_BGR2GRAY)
     ret, thresh = cv2.threshold(imgray, 127, 255, cv2.THRESH_BINARY)
 
+    # recuperation des composantes connexes
     output = cv2.connectedComponentsWithStats(thresh, 8, cv2.CV_32S)
     centroids = output[3]
 
     structElement = strel.build_as_list('disque', rayonDisqueCouleur, None)
 
+    # boucle sur les centroids pour placer les cercles de couleurs
     taille = imgContour.shape
     for centroid in centroids[0:output[0]]:
         for (i, j) in structElement:
@@ -126,6 +128,7 @@ def ajouterIndicationCouleursZoneErosionSuccessives(imgContour, imgNettoyee, ray
     imgContour[:, 0] = 0
     imgContour[:, m.shape[1] - 1] = 0
 
+    # Iteration sur les pixels de imgContour
     for x in range(0, taille[0]):
         for y in range(0, taille[1]):
             if np.any(imgContour[x, y]) != 0:
@@ -135,20 +138,24 @@ def ajouterIndicationCouleursZoneErosionSuccessives(imgContour, imgNettoyee, ray
                 m[x, y] = 255
                 imgReconInf = utils.reconstructionInferieure(imgContour, m, gamma8)
 
-                # Erosion successive
+                # Erosion successive jusqu'a faire disparaitre la zone
                 continuer = True
                 i = 1
                 while continuer:
                     structElement = strel.build('disque', i, None)
                     imgErodee = utils.erode(imgReconInf, structElement)
 
+                    # Quand la zone a disparu, alors on prend l'erosion successive precedente afin de placer notre cercle de couleur
                     if np.amax(imgErodee) == 0:
                         structElement = strel.build('disque', i - 1, None)
                         imgErodee = utils.erode(imgReconInf, structElement)
 
+                        # On reboucle afin de chercher un pixel de la zone isolee restant apres les erosions successives
                         for x in range(0, taille[0]):
                             for y in range(0, taille[1]):
                                 if np.any(imgErodee[x, y]) != 0:
+
+                                    # Boucle permettant de creer notre cercle de couleur a partir de l'element structurant
                                     for (i, j) in structElementCercle:
                                         if x < (taille[1] - rayonDisqueCouleur) and y < (
                                                 taille[0] - rayonDisqueCouleur):
@@ -161,6 +168,7 @@ def ajouterIndicationCouleursZoneErosionSuccessives(imgContour, imgNettoyee, ray
 
                     i = i + 1
 
+                # on enleve la zone isolee de image contour afin de ne pas traiter plusieurs fois les zones
                 imgContour = imgContour - imgReconInf
 
     return imgFinale
